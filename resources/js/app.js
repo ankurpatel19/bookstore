@@ -6,6 +6,13 @@
 
 import "./bootstrap";
 import { createApp } from "vue";
+import moment from "moment";
+import {
+    HasError,
+    AlertError,
+    AlertErrors,
+    AlertSuccess,
+} from "vform/src/components/bootstrap5";
 
 /**
  * Next, we will create a fresh Vue application instance. You may then begin
@@ -14,9 +21,21 @@ import { createApp } from "vue";
  */
 
 const app = createApp({});
-
-i; /* mport ExampleComponent from './components/ExampleComponent.vue';
-app.component('example-component', ExampleComponent); */
+app.component(HasError.name, HasError);
+app.component(AlertError.name, AlertError);
+app.component(AlertErrors.name, AlertErrors);
+app.component(AlertSuccess.name, AlertSuccess);
+app.mixin({
+    methods: {
+        dateFormat(value) {
+            if (value) {
+                return moment(String(value)).format("MM/DD/YYYY hh:mm");
+            }
+        },
+    },
+});
+/* import ExampleComponent from "./components/ExampleComponent.vue";
+app.component("example-component", ExampleComponent); */
 
 /**
  * The following block of code may be used to automatically register your
@@ -25,15 +44,23 @@ app.component('example-component', ExampleComponent); */
  *
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
-
-// Object.entries(import.meta.glob('./**/*.vue', { eager: true })).forEach(([path, definition]) => {
-//     app.component(path.split('/').pop().replace(/\.\w+$/, ''), definition.default);
-// });
-
+const files = require.context("./", true, /\.vue$/i);
+files
+    .keys()
+    .map((key) =>
+        app.component(key.split("/").pop().split(".")[0], files(key).default)
+    );
 /**
  * Finally, we will attach the application instance to a HTML element with
  * an "id" attribute of "app". This element is included with the "auth"
  * scaffolding. Otherwise, you will need to add an element yourself.
  */
-
-app.mount("#app");
+if (document.querySelector("#app-book")) {
+    app.mount("#app-book");
+}
+if (document.querySelector("#create-book")) {
+    app.mount("#create-book");
+}
+if (document.querySelector("#edit-book")) {
+    app.mount("#edit-book");
+}

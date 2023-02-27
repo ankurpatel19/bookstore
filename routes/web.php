@@ -14,10 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/books');
 });
 
-Auth::routes();
-
+Auth::routes(['register' => false]);
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    Route::resource('books', App\Http\Controllers\BookController::class);
+});
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/export-book-data', [App\Http\Controllers\HomeController::class, 'export_book_data'])->name('export_book_data');
+Route::get('/books', [App\Http\Controllers\BookController::class, 'get_books'])->name('book-list');
+Route::get('/books/{book:slug}', [App\Http\Controllers\BookController::class, 'show_book'])->name('book.detail');
